@@ -1,7 +1,7 @@
 require("dotenv").config();
 let express = require("express");
 let cors = require("cors");
-let strip = require("stripe")(process.env.STRIPE_SECRET_KEY);
+let stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // constants
 const app = express();
@@ -26,7 +26,7 @@ app.get("/", (req, res, next) => {
 app.post("/create-payment-intent", async (req, res) => {
   const { amount, currency, paymentMethodType } = req.body;
   try {
-    const paymentIntent = await strip.paymentIntents.create({
+    const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       payment_method_types: [paymentMethodType],
@@ -42,7 +42,7 @@ app.post("/webhook", async (req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
   try {
-    event = strip.webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       req.rawBody, // raw body
       sig,
       process.env.STRIPE_WEBHOOK_SECRET // your webhook secret
