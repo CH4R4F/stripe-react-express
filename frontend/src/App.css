@@ -1,0 +1,26 @@
+.StripeElement {
+  display: block;
+  margin: 10px 0 20px 0;
+  background-color: #fafafa;
+  padding: 10px 14px;
+  font-size: 1em;
+  font-family: "Source Code Pro", monospace;
+  border: 2px solid #e2e8f0;
+  outline: 0;
+}
+
+.StripeElement--focus {
+  border-bottom: 2px solid #01896a;
+  -webkit-transition: all 150ms ease;
+  transition: all 150ms ease;
+}
+
+.StripeElement.IdealBankElement,
+.StripeElement.FpxBankElement,
+.StripeElement.PaymentRequestButton {
+  padding: 0;
+}
+
+.StripeElement.PaymentRequestButton {
+  height: 40px;
+}
