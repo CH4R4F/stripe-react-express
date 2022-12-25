@@ -6,8 +6,16 @@ let strip = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // constants
 const app = express();
 
+// get raw body not parsed
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
+
 // middlewares
-app.use(express.json());
 app.use(cors());
 
 // routes
@@ -27,6 +35,35 @@ app.post("/create-payment-intent", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+app.post("/webhook", async (req, res) => {
+  // get segnature from header
+  const sig = req.headers["stripe-signature"];
+  let event;
+  try {
+    event = strip.webhooks.constructEvent(
+      req.rawBody, // raw body
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET // your webhook secret
+    );
+  } catch (err) {
+    res.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  // handle the event
+  switch (event.type) {
+    case "customer.created":
+      console.log("customer created");
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}.`);
+    // ... handle other event types
+  }
+
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
 });
 
 // run server
